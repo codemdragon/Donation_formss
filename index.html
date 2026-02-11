@@ -447,7 +447,8 @@
         const SUPABASE_URL = 'https://jexmkavljsaksejruvih.supabase.co'
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpleG1rYXZsanNha3NlanJ1dmloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3OTk1NTUsImV4cCI6MjA4NjM3NTU1NX0.i9TVDeWygTWSc8gQ-BNrYWULUIFz6i6aEGgu-UHXnAo'
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        // Create client - use window.supabaseClient to avoid conflicts
+        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     </script>
 </head>
 
@@ -643,10 +644,10 @@
                 this.setupCnicAutoTab();
                 this.setupListeners();
 
-                const { data: { session } } = await supabase.auth.getSession()
+                const { data: { session } } = await supabaseClient.auth.getSession()
 
                 if (session) {
-                    const { data: userData, error } = await supabase
+                    const { data: userData, error } = await supabaseClient
                         .from('users')
                         .select('*, branches(name)')
                         .eq('id', session.user.id)
@@ -657,7 +658,7 @@
                         await this.fetchRequests()
                         this.switchView('dashboard')
                     } else {
-                        await supabase.auth.signOut()
+                        await supabaseClient.auth.signOut()
                         this.switchView('login')
                     }
                 } else {
@@ -667,7 +668,7 @@
 
             async fetchRequests() {
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('requests')
                         .select('*, branches(name)')
                         .order('created_at', { ascending: false })
@@ -683,7 +684,7 @@
 
             async insertRequest(entry) {
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('requests')
                         .insert([{
                             full_name: entry.full_name,
@@ -708,7 +709,7 @@
 
             async updateRequest(id, updates) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('requests')
                         .update(updates)
                         .eq('id', id)
@@ -722,7 +723,7 @@
 
             async deleteRequest(id) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('requests')
                         .delete()
                         .eq('id', id)
@@ -736,7 +737,7 @@
 
             async checkDuplicate(cnic, mobile) {
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .rpc('check_duplicate', {
                             p_cnic: cnic,
                             p_mobile: mobile
@@ -792,7 +793,7 @@
                     const email = document.getElementById('user').value.trim();
                     const password = document.getElementById('pass').value;
 
-                    const { data, error } = await supabase.auth.signInWithPassword({
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
                         email: email,
                         password: password
                     })
@@ -1018,7 +1019,7 @@
                 const ids = Array.from(this.selectedIds);
 
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('requests')
                         .update({ status: 'Delivered' })
                         .in('id', ids)
@@ -1062,7 +1063,7 @@
             },
 
             async logout() {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 this.switchView('login');
             },
 
