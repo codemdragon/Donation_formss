@@ -49,6 +49,7 @@
             }
         }
 
+        /* Responsive Navigation */
         nav {
             background: var(--primary-dark);
             color: white;
@@ -115,8 +116,10 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             overflow: hidden;
+            /* Contains floats/margins */
         }
 
+        /* Form Styling */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -143,12 +146,15 @@
             border-radius: 6px;
         }
 
+        /* Responsive CNIC Input */
         .cnic-container {
             display: flex;
             align-items: center;
             gap: 5px;
             flex-wrap: nowrap;
+            /* Forced single line */
             overflow-x: auto;
+            /* Allow scroll on very small screens if needed */
         }
 
         .cnic-group {
@@ -159,6 +165,8 @@
         .cnic-box {
             width: 32px;
             min-width: 25px;
+            /* Allow shrinking slightly */
+            height: 40px;
             height: 40px;
             text-align: center;
             font-size: 1rem;
@@ -190,6 +198,7 @@
             background: var(--primary-dark);
         }
 
+        /* Dashboard Styles */
         .section-title {
             font-size: 1.2rem;
             margin-bottom: 15px;
@@ -203,6 +212,7 @@
             gap: 10px;
         }
 
+        /* Controls & Filters */
         .controls {
             display: flex;
             flex-wrap: wrap;
@@ -223,6 +233,7 @@
             border-radius: 6px;
         }
 
+        /* Bulk Actions Toolbar */
         .bulk-actions {
             background: #dbeafe;
             border: 1px solid #93c5fd;
@@ -251,6 +262,7 @@
             background: #047857;
         }
 
+        /* Responsive Table */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -357,6 +369,7 @@
             border-color: #fecaca;
         }
 
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -416,6 +429,7 @@
             transform: translateY(0);
         }
 
+        /* Mobile Adjustments */
         @media (max-width: 640px) {
             .nav-brand {
                 font-size: 1.1rem;
@@ -442,14 +456,6 @@
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = 'https://jexmkavljsaksejruvih.supabase.co'
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpleG1rYXZsanNha3NlanJ1dmloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3OTk1NTUsImV4cCI6MjA4NjM3NTU1NX0.i9TVDeWygTWSc8gQ-BNrYWULUIFz6i6aEGgu-UHXnAo'
-        
-        // Create client - use window.supabaseClient to avoid conflicts
-        window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    </script>
 </head>
 
 <body>
@@ -471,8 +477,8 @@
                     authorized personnel</p>
                 <form id="loginForm">
                     <div class="form-group" style="margin-bottom: 15px;">
-                        <label>Email</label>
-                        <input type="email" id="user" placeholder="admin@ration.local" required>
+                        <label>Username</label>
+                        <input type="text" id="user" placeholder="e.g. admin or b1" required>
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label>Password</label>
@@ -482,10 +488,10 @@
 
                     <div
                         style="margin-top: 20px; background: #f0fdf4; padding: 15px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #bbf7d0; color: #166534;">
-                        <strong>Create users in Supabase Auth first:</strong><br>
-                        admin@ration.local (role: admin)<br>
-                        b1@ration.local (role: branch)<br>
-                        b2@ration.local (role: branch)
+                        <strong>Demo Credentials:</strong><br>
+                        Admin: admin / admin<br>
+                        Branch 1: b1 / pass<br>
+                        Branch 2: b2 / pass
                     </div>
                 </form>
             </div>
@@ -494,7 +500,7 @@
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="hidden fade-in">
 
-            <!-- ENTRY FORM -->
+            <!-- ENTRY FORM (Only visible to Branch Users) -->
             <div id="entry-form-section" class="card">
                 <div class="section-title">
                     <span>New Ration Entry</span>
@@ -550,6 +556,9 @@
                             <label>Complete Address</label>
                             <input type="text" id="address" placeholder="House/Flat No, Street, Block" required>
                         </div>
+
+                        <!-- Status hidden default -->
+                        <input type="hidden" id="entryStatus" value="Registered">
                     </div>
 
                     <button type="submit" class="submit-btn">Check Eligibility & Register</button>
@@ -563,8 +572,8 @@
                 </div>
 
                 <div class="controls">
-                    <input type="text" id="f-cnic" placeholder="🔍 Search CNIC..." onkeyup="app.filter()">
-                    <input type="text" id="f-mobile" placeholder="🔍 Search Mobile..." onkeyup="app.filter()">
+                    <input type="text" id="f-cnic" placeholder=" Search CNIC..." onkeyup="app.filter()">
+                    <input type="text" id="f-mobile" placeholder=" Search Mobile..." onkeyup="app.filter()">
                     <select id="f-area" onchange="app.filter()">
                         <option value="">All Areas</option>
                         <option value="DHA">DHA</option>
@@ -581,6 +590,7 @@
                         style="background:#6b7280; color:white; padding:10px 15px;">Reset</button>
                 </div>
 
+                <!-- Bulk Action Bar (Hidden by default) -->
                 <div id="bulk-actions-bar" class="bulk-actions hidden">
                     <div>
                         <span style="font-weight: bold;">Selected: </span>
@@ -612,12 +622,64 @@
         </div>
     </div>
 
+    <!-- BRANCH MANAGEMENT VIEW -->
+    <div id="view-branches" class="hidden fade-in">
+        <div class="card">
+            <div class="section-title">
+                <span>Manage Branches</span>
+                <button class="action-btn" onclick="app.switchView('dashboard')"
+                    style="background:#6b7280; color:white;">&larr; Back to Dashboard</button>
+            </div>
+
+            <div class="form-grid"
+                style="margin-bottom: 30px; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <div class="form-group">
+                    <label>Branch Name</label>
+                    <input type="text" id="newBrName" placeholder="e.g. Saylani Gui" required>
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="newBrUser" placeholder="e.g. b3" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="newBrPass" placeholder="e.g. pass123" required>
+                </div>
+                <div class="form-group" style="display:flex; align-items:flex-end;">
+                    <button class="submit-btn" onclick="app.addBranch()" style="margin-top:0;">+ Add Branch</button>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span>Existing Branches</span>
+            </div>
+
+            <div class="table-responsive">
+                <table id="branchTable">
+                    <thead>
+                        <tr>
+                            <th>Branch Name</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="branchTableBody">
+                        <!-- Dynamic Content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- MODAL -->
     <div id="duplicateModal" class="modal-overlay">
         <div class="modal">
             <div style="font-size: 3rem; margin-bottom: 10px;">⚠️</div>
             <h3 style="color:var(--warning); margin-bottom:10px;">Duplicate Record Found!</h3>
             <div id="duplicateMsg"
                 style="background: #fffbeb; padding: 15px; border-radius: 8px; border: 1px solid #fde68a; text-align: left; font-size: 0.9rem; color: #92400e; margin-bottom: 20px;">
+                <!-- Dynamic Content -->
             </div>
             <p style="margin-bottom: 20px;">This recipient has already received ration. Do you still want to register
                 them again?</p>
@@ -634,138 +696,98 @@
     <div id="toast" class="toast"><span id="toastMsg"></span></div>
 
     <script>
+        // --- DATA ---
+        // Basic user auth structure (Persisted for branch management)
+        // const users = [ ... ]; // Removed hardcoded users
+
+
         const app = {
             currentUser: null,
             modalPromise: null,
-            data: [],
+            currentUser: null,
+            modalPromise: null,
+            data: [], // Will hold requests
+            users: [], // Will hold users
             selectedIds: new Set(),
 
-            async init() {
+            init() {
+                this.loadUsers();
+                this.loadData();
                 this.setupCnicAutoTab();
                 this.setupListeners();
-
-                const { data: { session } } = await supabaseClient.auth.getSession()
-
-                if (session) {
-                    const { data: userData, error } = await supabaseClient
-                        .from('users')
-                        .select('*, branches(name)')
-                        .eq('id', session.user.id)
-                        .single()
-
-                    if (userData) {
-                        this.currentUser = userData
-                        await this.fetchRequests()
-                        this.switchView('dashboard')
+                // Check if session exists (simple check)
+                const savedUser = localStorage.getItem('rds_user');
+                if (savedUser) {
+                    this.currentUser = JSON.parse(savedUser);
+                    // Validate if user still exists (in case it was deleted)
+                    const validUser = this.users.find(u => u.id === this.currentUser.id);
+                    if (validUser) {
+                        this.currentUser = validUser; // Update ref
+                        this.switchView('dashboard');
                     } else {
-                        await supabaseClient.auth.signOut()
-                        this.switchView('login')
+                        localStorage.removeItem('rds_user');
+                        this.switchView('login');
                     }
                 } else {
-                    this.switchView('login')
+                    this.switchView('login');
                 }
             },
 
-            async fetchRequests() {
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('requests')
-                        .select('*, branches(name)')
-                        .order('created_at', { ascending: false })
-
-                    if (error) throw error
-                    this.data = data || []
-                    this.renderDash()
-                } catch (error) {
-                    console.error('Error fetching requests:', error)
-                    this.showToast('Failed to load requests')
+            loadUsers() {
+                const storedUsers = localStorage.getItem('rds_users');
+                if (storedUsers) {
+                    this.users = JSON.parse(storedUsers);
+                } else {
+                    // Default seed data
+                    this.users = [
+                        { id: 'admin', u: 'admin', p: 'admin', n: 'Head Office', r: 'admin' },
+                        { id: 'b1', u: 'b1', p: 'pass', n: 'Saylani DHA', r: 'branch' },
+                        { id: 'b2', u: 'b2', p: 'pass', n: 'Saylani Clifton', r: 'branch' }
+                    ];
+                    this.saveUsers();
                 }
             },
 
-            async insertRequest(entry) {
-                try {
-                    const { data, error } = await supabaseClient
-                        .from('requests')
-                        .insert([{
-                            full_name: entry.full_name,
-                            cnic: entry.cnic,
-                            mobile: entry.mobile,
-                            area: entry.area,
-                            address: entry.address,
-                            status: entry.status || 'Registered',
-                            branch_id: this.currentUser.branch_id,
-                            is_duplicate: entry.is_duplicate || false
-                        }])
-                        .select()
+            saveUsers() {
+                localStorage.setItem('rds_users', JSON.stringify(this.users));
+            },
 
-                    if (error) throw error
-                    return data[0]
-                } catch (error) {
-                    console.error('Error inserting request:', error)
-                    this.showToast('Failed to save request')
-                    throw error
+            loadData() {
+                const stored = localStorage.getItem('rds_data');
+                if (stored) {
+                    this.data = JSON.parse(stored);
+                } else {
+                    // Default seed data if empty
+                    this.data = [
+                        { id: 1708891000000, name: 'Ahmad Ali', cnic: '42101-1111111-1', mob: '03001111111', area: 'DHA', addr: 'Street 1, Phase 2', status: 'Registered', branch_id: 'b1', ts: '2023-10-25 09:15:02', isDup: false },
+                        { id: 1708892000000, name: 'Sarah Khan', cnic: '42101-2222222-2', mob: '03002222222', area: 'Clifton', addr: 'Flat 402, Ocean View', status: 'Delivered', branch_id: 'b2', ts: '2023-10-24 14:05:11', isDup: false },
+                    ];
+                    this.saveData();
                 }
             },
 
-            async updateRequest(id, updates) {
-                try {
-                    const { error } = await supabaseClient
-                        .from('requests')
-                        .update(updates)
-                        .eq('id', id)
-
-                    if (error) throw error
-                } catch (error) {
-                    console.error('Error updating request:', error)
-                    this.showToast('Failed to update request')
-                }
-            },
-
-            async deleteRequest(id) {
-                try {
-                    const { error } = await supabaseClient
-                        .from('requests')
-                        .delete()
-                        .eq('id', id)
-
-                    if (error) throw error
-                } catch (error) {
-                    console.error('Error deleting request:', error)
-                    this.showToast('Failed to delete request')
-                }
-            },
-
-            async checkDuplicate(cnic, mobile) {
-                try {
-                    const { data, error } = await supabaseClient
-                        .rpc('check_duplicate', {
-                            p_cnic: cnic,
-                            p_mobile: mobile
-                        })
-
-                    if (error) throw error
-                    return data && data.length > 0 ? data[0] : null
-                } catch (error) {
-                    console.error('Error checking duplicate:', error)
-                    return null
-                }
+            saveData() {
+                localStorage.setItem('rds_data', JSON.stringify(this.data));
             },
 
             setupCnicAutoTab() {
                 const boxes = document.querySelectorAll('.cnic-box');
                 boxes.forEach((box, i) => {
+                    // Auto-tab
                     box.oninput = () => {
                         if (box.value && boxes[i + 1]) boxes[i + 1].focus();
                     };
 
+                    // Backspace navigation
                     box.onkeydown = (e) => {
                         if (e.key === 'Backspace' && !box.value && boxes[i - 1]) boxes[i - 1].focus();
                     };
 
+                    // Paste support
                     box.onpaste = (e) => {
                         e.preventDefault();
                         const pasteData = (e.clipboardData || window.clipboardData).getData('text');
-                        const digits = pasteData.replace(/\D/g, '');
+                        const digits = pasteData.replace(/\D/g, ''); // Keep numbers only
 
                         if (!digits) return;
 
@@ -778,6 +800,7 @@
                             digitIdx++;
                         }
 
+                        // Focus the next empty box or the last one
                         if (currentIdx < boxes.length) {
                             boxes[currentIdx].focus();
                         } else {
@@ -788,23 +811,23 @@
             },
 
             setupListeners() {
-                document.getElementById('loginForm').onsubmit = async (e) => {
+                // Login
+                document.getElementById('loginForm').onsubmit = (e) => {
                     e.preventDefault();
-                    const email = document.getElementById('user').value.trim();
-                    const password = document.getElementById('pass').value;
+                    const uIn = document.getElementById('user').value.toLowerCase().trim();
+                    const pIn = document.getElementById('pass').value;
+                    const u = this.users.find(x => x.u === uIn && x.p === pIn);
 
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    })
-
-                    if (error) {
-                        this.showToast(error.message);
+                    if (u) {
+                        this.currentUser = u;
+                        localStorage.setItem('rds_user', JSON.stringify(u));
+                        this.switchView('dashboard');
                     } else {
-                        await this.init();
+                        this.showToast("Invalid Credentials");
                     }
                 };
 
+                // Entry Form
                 document.getElementById('requestForm').onsubmit = async (e) => {
                     e.preventDefault();
                     await this.handleEntry();
@@ -813,10 +836,7 @@
 
             async handleEntry() {
                 const cnicRaw = [...document.querySelectorAll('.cnic-box')].map(b => b.value).join('');
-                if (cnicRaw.length !== 13) { 
-                    this.showToast("Invalid CNIC length"); 
-                    return; 
-                }
+                if (cnicRaw.length !== 13) { this.showToast("Invalid CNIC length"); return; }
 
                 const formattedCnic = `${cnicRaw.slice(0, 5)}-${cnicRaw.slice(5, 12)}-${cnicRaw.slice(12)}`;
                 const mobile = document.getElementById('mobile').value;
@@ -828,38 +848,51 @@
                     return;
                 }
 
-                const entry = {
-                    full_name: document.getElementById('fullName').value,
+                // New Entry Object
+                const newEntry = {
+                    id: Date.now(),
+                    name: document.getElementById('fullName').value,
                     cnic: formattedCnic,
-                    mobile: mobile,
+                    mob: mobile,
                     area: finalArea,
-                    address: document.getElementById('address').value,
-                    status: 'Registered',
-                    is_duplicate: false
+                    addr: document.getElementById('address').value,
+                    status: 'Registered', // Default status
+                    branch_id: this.currentUser.id,
+                    ts: this.getTimestamp(),
+                    isDup: false
                 };
 
-                const duplicate = await this.checkDuplicate(formattedCnic, mobile)
+                // Check Duplicates (Global check)
+                const duplicate = this.data.find(r => r.cnic === formattedCnic || r.mob === mobile);
 
                 if (duplicate) {
-                    const field = duplicate.found ? (formattedCnic === duplicate.cnic ? 'CNIC' : 'Mobile') : '';
-                    const msg = `This ${field} has already been registered in ${duplicate.branch_name || 'another branch'} on ${new Date(duplicate.created_at).toLocaleString()}.`;
-                    
-                    document.getElementById('duplicateMsg').innerHTML = `
-                        <strong>⚠️ Alert:</strong><br>
-                        ${msg}
-                    `;
-                    
-                    const confirmed = await this.askUser();
-                    if (!confirmed) return;
-                    
-                    entry.is_duplicate = true;
+                    // Logic to find branch name
+                    // Logic to find branch name
+                    const branchName = this.users.find(u => u.id === duplicate.branch_id)?.n || 'Unknown Branch';
+                    const matchType = (duplicate.cnic === formattedCnic) ? "CNIC" : "Mobile Number";
+
+                    const msg = `This <strong>${matchType}</strong> (${duplicate.cnic === formattedCnic ? duplicate.cnic : duplicate.mob}) was already registered in <strong>${branchName}</strong> on <strong>${duplicate.ts}</strong>.`;
+
+                    document.getElementById('duplicateMsg').innerHTML = msg;
+
+                    const allow = await this.askUser(); // Open Modal
+
+                    if (allow) {
+                        newEntry.isDup = true;
+                        this.addRecord(newEntry);
+                        this.resetForm(document.getElementById('requestForm'));
+                    }
+                } else {
+                    this.addRecord(newEntry);
+                    this.resetForm(document.getElementById('requestForm'));
                 }
+            },
 
-                await this.insertRequest(entry);
-                await this.fetchRequests();
-
-                this.resetForm(document.getElementById('requestForm'));
-                this.showToast(entry.is_duplicate ? "Duplicate Entry Added" : "Recipient Registered Successfully");
+            addRecord(entry) {
+                this.data.unshift(entry);
+                this.saveData();
+                this.showToast(entry.isDup ? "Duplicate Entry Added" : "Recipient Registered Successfully");
+                this.renderDash();
             },
 
             resetForm(form) {
@@ -879,20 +912,25 @@
                 }
             },
 
+            // --- DASHBOARD RENDERING ---
+
             switchView(v) {
                 document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
                 document.getElementById('view-' + v).classList.remove('hidden');
 
                 if (v === 'dashboard') {
                     this.prepareDashboard();
+                } else if (v === 'branches') {
+                    this.prepareBranches();
                 } else {
                     this.currentUser = null;
+                    localStorage.removeItem('rds_user');
                 }
                 this.renderNav();
             },
 
             prepareDashboard() {
-                const isAdmin = this.currentUser.role === 'admin';
+                const isAdmin = this.currentUser.r === 'admin';
                 const formSection = document.getElementById('entry-form-section');
 
                 if (isAdmin) {
@@ -907,6 +945,7 @@
                 }
 
                 this.selectedIds.clear();
+                this.renderDash();
             },
 
             getFilteredData() {
@@ -914,13 +953,13 @@
                 const mTerm = document.getElementById('f-mobile').value.toLowerCase();
                 const aTerm = document.getElementById('f-area').value;
                 const sTerm = document.getElementById('f-status').value;
-                const isAdmin = this.currentUser.role === 'admin';
+                const isAdmin = this.currentUser.r === 'admin';
 
-                let baseData = isAdmin ? this.data : this.data.filter(r => r.branch_id === this.currentUser.branch_id);
+                let baseData = isAdmin ? this.data : this.data.filter(r => r.branch_id === this.currentUser.id);
 
                 return baseData.filter(r => {
-                    const matchesCnic = (r.cnic || '').toLowerCase().includes(cTerm);
-                    const matchesMob = (r.mobile || '').toLowerCase().includes(mTerm);
+                    const matchesCnic = r.cnic.includes(cTerm);
+                    const matchesMob = r.mob.includes(mTerm);
                     let matchesArea = true;
                     if (aTerm) {
                         if (aTerm === 'Others') matchesArea = !['DHA', 'Clifton', 'Tariq Road'].includes(r.area);
@@ -937,8 +976,9 @@
                 body.innerHTML = '';
 
                 const filtered = this.getFilteredData();
-                const isAdmin = this.currentUser.role === 'admin';
+                const isAdmin = this.currentUser.r === 'admin';
 
+                // Handle Bulk Selection State
                 document.getElementById('selectAll').checked = filtered.length > 0 && filtered.every(r => this.selectedIds.has(r.id));
                 this.updateBulkBar();
 
@@ -948,34 +988,35 @@
                 }
 
                 filtered.forEach(r => {
-                    const branchName = r.branches ? r.branches.name : 'Unknown';
-                    const dupClass = r.is_duplicate ? 'row-duplicate' : '';
+                    const branchName = this.users.find(u => u.id === r.branch_id)?.n || 'Unknown';
+                    const dupClass = r.isDup ? 'row-duplicate' : '';
                     const isChecked = this.selectedIds.has(r.id) ? 'checked' : '';
 
-                    const statusBadge = r.is_duplicate
+                    const statusBadge = r.isDup
                         ? `<span class="badge badge-dup">Dup / ${r.status}</span>`
                         : `<span class="badge ${r.status === 'Delivered' ? 'badge-del' : 'badge-reg'}">${r.status}</span>`;
 
+                    // Single Action Button Logic
                     let actionHtml = '';
                     if (r.status === 'Registered') {
-                        actionHtml += `<button class="action-btn btn-deliver" onclick="app.changeStatus('${r.id}', 'Delivered')">Mark Delivered</button>`;
+                        actionHtml += `<button class="action-btn btn-deliver" onclick="app.setStatus(${r.id}, 'Delivered')">Mark Delivered</button>`;
                     }
                     if (isAdmin) {
-                        actionHtml += ` <button class="action-btn btn-delete" onclick="app.handleDelete('${r.id}')">Del</button>`;
+                        actionHtml += ` <button class="action-btn btn-delete" onclick="app.deleteRecord(${r.id})">Del</button>`;
                     }
 
                     const tr = document.createElement('tr');
                     tr.className = dupClass;
                     tr.innerHTML = `
-                        <td class="checkbox-col"><input type="checkbox" class="row-select" onchange="app.toggleSelect('${r.id}')" ${isChecked}></td>
-                        <td><strong>${r.full_name}</strong></td>
+                        <td class="checkbox-col"><input type="checkbox" class="row-select" onchange="app.toggleSelect(${r.id})" ${isChecked}></td>
+                        <td><strong>${r.name}</strong></td>
                         <td>
                             <div style="font-family:monospace; font-size:0.9rem;">${r.cnic}</div>
-                            <div style="font-size:0.8rem; color:#666;">${r.mobile}</div>
+                            <div style="font-size:0.8rem; color:#666;">${r.mob}</div>
                         </td>
                         <td>${r.area}</td>
-                        <td style="font-size:0.85rem; max-width:200px;">${r.address || ''}</td>
-                        <td style="font-size:0.8rem; color:#666; white-space:nowrap;">${new Date(r.created_at).toLocaleString()}</td>
+                        <td style="font-size:0.85rem; max-width:200px;">${r.addr}</td>
+                        <td style="font-size:0.8rem; color:#666; white-space:nowrap;">${r.ts}</td>
                         ${isAdmin ? `<td style="font-size:0.8rem;">${branchName}</td>` : '<td class="hidden"></td>'}
                         <td>${statusBadge}</td>
                         <td style="display:flex; gap:5px; flex-wrap:wrap;">${actionHtml}</td>
@@ -984,10 +1025,12 @@
                 });
             },
 
+            // --- BULK ACTIONS ---
+
             toggleSelect(id) {
                 if (this.selectedIds.has(id)) this.selectedIds.delete(id);
                 else this.selectedIds.add(id);
-                this.renderDash();
+                this.renderDash(); // Re-render to update header checkbox
             },
 
             toggleSelectAll() {
@@ -1013,47 +1056,60 @@
                 }
             },
 
-            async bulkDeliver() {
+            bulkDeliver() {
                 if (!confirm(`Mark ${this.selectedIds.size} recipients as Delivered?`)) return;
 
-                const ids = Array.from(this.selectedIds);
+                let updatedCount = 0;
+                this.data.forEach(r => {
+                    if (this.selectedIds.has(r.id) && r.status !== 'Delivered') {
+                        r.status = 'Delivered';
+                        updatedCount++;
+                    }
+                });
 
-                try {
-                    const { error } = await supabaseClient
-                        .from('requests')
-                        .update({ status: 'Delivered' })
-                        .in('id', ids)
-
-                    if (error) throw error
-
-                    this.showToast(`${ids.length} records updated to Delivered`);
+                if (updatedCount > 0) {
+                    this.saveData();
                     this.selectedIds.clear();
-                    await this.fetchRequests();
-                } catch (e) {
-                    console.error(e);
-                    this.showToast('Bulk update failed');
+                    this.showToast(`${updatedCount} records updated to Delivered`);
+                    this.renderDash();
+                } else {
+                    this.showToast("Selected records are already Delivered");
                 }
             },
 
-            async changeStatus(id, newStatus) {
-                await this.updateRequest(id, { status: newStatus })
-                await this.fetchRequests()
+            // --- SINGLE ACTIONS ---
+
+            setStatus(id, status) {
+                const rec = this.data.find(r => r.id === id);
+                if (rec) {
+                    rec.status = status;
+                    this.saveData();
+                    this.renderDash();
+                    this.showToast(`Status updated to ${status}`);
+                }
             },
 
-            async handleDelete(id) {
-                if (!confirm('Permanently delete this request?')) return
-
-                await this.deleteRequest(id)
-                await this.fetchRequests()
+            deleteRecord(id) {
+                if (confirm("Are you sure you want to permanently delete this record?")) {
+                    this.data = this.data.filter(r => r.id !== id);
+                    this.saveData();
+                    this.selectedIds.delete(id); // remove from selection if selected
+                    this.renderDash();
+                    this.showToast("Record Deleted");
+                }
             },
+
+            // --- UTILS ---
 
             renderNav() {
                 const nav = document.getElementById('nav-actions');
                 const branchLabel = document.getElementById('nav-branch-name');
                 if (this.currentUser) {
-                    const branchName = this.currentUser.branches ? this.currentUser.branches.name : 'User';
-                    branchLabel.innerText = branchName;
+                    branchLabel.innerText = this.currentUser.n;
                     let html = '';
+                    if (this.currentUser.r === 'admin') {
+                        html += `<button onclick="app.switchView('branches')" style="background:var(--primary); color:white; margin-right:10px;">Manage Branches</button>`;
+                    }
                     html += `<button class="nav-btn-danger" onclick="app.logout()">Logout</button>`;
                     nav.innerHTML = html;
                 } else {
@@ -1062,8 +1118,7 @@
                 }
             },
 
-            async logout() {
-                await supabaseClient.auth.signOut();
+            logout() {
                 this.switchView('login');
             },
 
@@ -1075,6 +1130,15 @@
                 document.getElementById('f-area').value = '';
                 document.getElementById('f-status').value = '';
                 this.renderDash();
+            },
+
+            getTimestamp() {
+                const now = new Date();
+                return now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0') + ' ' +
+                    String(now.getHours()).padStart(2, '0') + ':' +
+                    String(now.getMinutes()).padStart(2, '0');
             },
 
             askUser() {
@@ -1092,9 +1156,81 @@
                 document.getElementById('toastMsg').innerText = m;
                 t.classList.add('show');
                 setTimeout(() => t.classList.remove('show'), 3000);
+            },
+
+            // --- BRANCH MANAGEMENT ---
+
+            prepareBranches() {
+                this.renderBranches();
+            },
+
+            renderBranches() {
+                const tbody = document.getElementById('branchTableBody');
+                tbody.innerHTML = '';
+
+                this.users.forEach(u => {
+                    // Don't show admin in the list (or disable deleting it)
+                    if (u.id === 'admin') return;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.n}</td>
+                        <td>${u.u}</td>
+                        <td style="font-family:monospace; letter-spacing:1px; color:#666;">${u.p}</td>
+                        <td>
+                            <button class="action-btn btn-delete" onclick="app.deleteBranch('${u.id}')">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            addBranch() {
+                const name = document.getElementById('newBrName').value.trim();
+                const user = document.getElementById('newBrUser').value.trim().toLowerCase();
+                const pass = document.getElementById('newBrPass').value.trim();
+
+                if (!name || !user || !pass) {
+                    this.showToast("Please fill all fields");
+                    return;
+                }
+
+                // Check username uniqueness
+                if (this.users.find(u => u.u === user)) {
+                    this.showToast("Username already exists");
+                    return;
+                }
+
+                const newBranch = {
+                    id: 'b_' + Date.now(),
+                    u: user,
+                    p: pass,
+                    n: name,
+                    r: 'branch'
+                };
+
+                this.users.push(newBranch);
+                this.saveUsers();
+                this.renderBranches();
+                this.showToast("Branch Added Successfully");
+
+                // Clear form
+                document.getElementById('newBrName').value = '';
+                document.getElementById('newBrUser').value = '';
+                document.getElementById('newBrPass').value = '';
+            },
+
+            deleteBranch(id) {
+                if (!confirm("Are you sure? This will not delete the data associated with the branch, but they won't be able to login.")) return;
+
+                this.users = this.users.filter(u => u.id !== id);
+                this.saveUsers();
+                this.renderBranches();
+                this.showToast("Branch Deleted");
             }
         };
 
+        // Initialize App
         app.init();
     </script>
 </body>
