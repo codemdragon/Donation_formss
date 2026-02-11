@@ -151,7 +151,10 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            /* Forced single line */
+            overflow-x: auto;
+            /* Allow scroll on very small screens if needed */
         }
 
         .cnic-group {
@@ -161,6 +164,9 @@
 
         .cnic-box {
             width: 32px;
+            min-width: 25px;
+            /* Allow shrinking slightly */
+            height: 40px;
             height: 40px;
             text-align: center;
             font-size: 1rem;
@@ -765,9 +771,42 @@
             },
 
             setupCnicAutoTab() {
-                document.querySelectorAll('.cnic-box').forEach((box, i, all) => {
-                    box.oninput = () => { if (box.value && all[i + 1]) all[i + 1].focus(); };
-                    box.onkeydown = (e) => { if (e.key === 'Backspace' && !box.value && all[i - 1]) all[i - 1].focus(); };
+                const boxes = document.querySelectorAll('.cnic-box');
+                boxes.forEach((box, i) => {
+                    // Auto-tab
+                    box.oninput = () => {
+                        if (box.value && boxes[i + 1]) boxes[i + 1].focus();
+                    };
+
+                    // Backspace navigation
+                    box.onkeydown = (e) => {
+                        if (e.key === 'Backspace' && !box.value && boxes[i - 1]) boxes[i - 1].focus();
+                    };
+
+                    // Paste support
+                    box.onpaste = (e) => {
+                        e.preventDefault();
+                        const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                        const digits = pasteData.replace(/\D/g, ''); // Keep numbers only
+
+                        if (!digits) return;
+
+                        let currentIdx = i;
+                        let digitIdx = 0;
+
+                        while (currentIdx < boxes.length && digitIdx < digits.length) {
+                            boxes[currentIdx].value = digits[digitIdx];
+                            currentIdx++;
+                            digitIdx++;
+                        }
+
+                        // Focus the next empty box or the last one
+                        if (currentIdx < boxes.length) {
+                            boxes[currentIdx].focus();
+                        } else {
+                            boxes[boxes.length - 1].focus();
+                        }
+                    };
                 });
             },
 
