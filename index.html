@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ration Distribution System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -31,29 +32,19 @@
             line-height: 1.6;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        /* Responsive Navigation */
         nav {
             background: var(--primary-dark);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 50;
@@ -82,7 +73,7 @@
             font-weight: 400;
             font-size: 0.9rem;
             opacity: 0.9;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
             padding: 2px 8px;
             border-radius: 4px;
             white-space: nowrap;
@@ -97,10 +88,7 @@
             font-size: 0.9rem;
         }
 
-        .nav-btn-danger {
-            background: var(--danger);
-            color: white;
-        }
+        .nav-btn-danger { background: var(--danger); color: white; }
 
         .app-container {
             max-width: 1400px;
@@ -113,22 +101,18 @@
             background: var(--card);
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             overflow: hidden;
-            /* Contains floats/margins */
         }
 
-        /* Form Styling */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 15px;
         }
 
-        .form-group {
-            margin-bottom: 5px;
-        }
+        .form-group { margin-bottom: 5px; }
 
         .form-group label {
             display: block;
@@ -146,27 +130,19 @@
             border-radius: 6px;
         }
 
-        /* Responsive CNIC Input */
         .cnic-container {
             display: flex;
             align-items: center;
             gap: 5px;
             flex-wrap: nowrap;
-            /* Forced single line */
             overflow-x: auto;
-            /* Allow scroll on very small screens if needed */
         }
 
-        .cnic-group {
-            display: flex;
-            gap: 4px;
-        }
+        .cnic-group { display: flex; gap: 4px; }
 
         .cnic-box {
             width: 32px;
             min-width: 25px;
-            /* Allow shrinking slightly */
-            height: 40px;
             height: 40px;
             text-align: center;
             font-size: 1rem;
@@ -176,10 +152,7 @@
             padding: 0;
         }
 
-        .cnic-sep {
-            font-weight: bold;
-            color: #9ca3af;
-        }
+        .cnic-sep { font-weight: bold; color: #9ca3af; }
 
         .submit-btn {
             background: var(--primary);
@@ -194,11 +167,9 @@
             transition: 0.2s;
         }
 
-        .submit-btn:hover {
-            background: var(--primary-dark);
-        }
+        .submit-btn:hover { background: var(--primary-dark); }
+        .submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
 
-        /* Dashboard Styles */
         .section-title {
             font-size: 1.2rem;
             margin-bottom: 15px;
@@ -212,7 +183,6 @@
             gap: 10px;
         }
 
-        /* Controls & Filters */
         .controls {
             display: flex;
             flex-wrap: wrap;
@@ -233,7 +203,6 @@
             border-radius: 6px;
         }
 
-        /* Bulk Actions Toolbar */
         .bulk-actions {
             background: #dbeafe;
             border: 1px solid #93c5fd;
@@ -258,11 +227,8 @@
             cursor: pointer;
         }
 
-        .btn-bulk-approve:hover {
-            background: #047857;
-        }
+        .btn-bulk-approve:hover { background: #047857; }
 
-        /* Responsive Table */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -274,8 +240,7 @@
             min-width: 900px;
         }
 
-        th,
-        td {
+        th, td {
             padding: 12px 15px;
             border-bottom: 1px solid var(--border);
             text-align: left;
@@ -291,14 +256,9 @@
             font-weight: 700;
         }
 
-        tr:hover {
-            background-color: #f8fafc;
-        }
+        tr:hover { background-color: #f8fafc; }
 
-        .checkbox-col {
-            width: 40px;
-            text-align: center;
-        }
+        .checkbox-col { width: 40px; text-align: center; }
 
         input[type="checkbox"] {
             width: 18px;
@@ -316,27 +276,11 @@
             white-space: nowrap;
         }
 
-        .badge-reg {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
-        }
+        .badge-reg { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-del { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-dup { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        .badge-del {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
-
-        .badge-dup {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .row-duplicate {
-            background-color: #fff1f2 !important;
-        }
+        .row-duplicate { background-color: #fff1f2 !important; }
 
         .action-btn {
             padding: 6px 12px;
@@ -349,34 +293,16 @@
             transition: 0.2s;
         }
 
-        .btn-deliver {
-            background: var(--success);
-            color: white;
-        }
+        .btn-deliver { background: var(--success); color: white; }
+        .btn-deliver:hover { background: #047857; }
 
-        .btn-deliver:hover {
-            background: #047857;
-        }
+        .btn-delete { background: white; color: var(--danger); border: 1px solid var(--border); }
+        .btn-delete:hover { background: #fee2e2; border-color: #fecaca; }
 
-        .btn-delete {
-            background: white;
-            color: var(--danger);
-            border: 1px solid var(--border);
-        }
-
-        .btn-delete:hover {
-            background: #fee2e2;
-            border-color: #fecaca;
-        }
-
-        /* Modal */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
             display: none;
             justify-content: center;
             align-items: center;
@@ -384,9 +310,7 @@
             padding: 20px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal {
             background: white;
@@ -395,20 +319,13 @@
             max-width: 500px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
             animation: slideUp 0.3s ease-out;
         }
 
         @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .toast {
@@ -422,43 +339,52 @@
             transform: translateY(100px);
             transition: 0.3s;
             z-index: 2000;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
-        .toast.show {
-            transform: translateY(0);
+        .toast.show { transform: translateY(0); }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        /* Mobile Adjustments */
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         @media (max-width: 640px) {
-            .nav-brand {
-                font-size: 1.1rem;
-            }
-
-            .section-title {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .cnic-box {
-                width: 28px;
-                height: 36px;
-                font-size: 0.9rem;
-            }
-
-            .modal {
-                padding: 20px;
-            }
+            .nav-brand { font-size: 1.1rem; }
+            .section-title { flex-direction: column; align-items: flex-start; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .cnic-box { width: 28px; height: 36px; font-size: 0.9rem; }
+            .modal { padding: 20px; }
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div style="color: var(--primary-dark); font-weight: 600;">Connecting to Database...</div>
+    </div>
 
     <nav>
         <div class="nav-inner">
@@ -470,29 +396,20 @@
     <div class="app-container">
 
         <!-- LOGIN VIEW -->
-        <div id="view-login" class="fade-in">
-            <div style="max-width: 400px; margin: 60px auto;" class="card">
-                <h2 style="text-align: center; margin-bottom: 10px; color: var(--primary-dark);">System Login</h2>
-                <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 0.9rem;">Access restricted to
-                    authorized personnel</p>
+        <div id="view-login" class="hidden fade-in">
+            <div style="max-width:400px; margin:60px auto;" class="card">
+                <h2 style="text-align:center; margin-bottom:10px; color:var(--primary-dark);">System Login</h2>
+                <p style="text-align:center; color:#666; margin-bottom:25px; font-size:0.9rem;">Access restricted to authorized personnel</p>
                 <form id="loginForm">
-                    <div class="form-group" style="margin-bottom: 15px;">
+                    <div class="form-group" style="margin-bottom:15px;">
                         <label>Username</label>
                         <input type="text" id="user" placeholder="e.g. admin or b1" required>
                     </div>
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom:20px;">
                         <label>Password</label>
                         <input type="password" id="pass" placeholder="Password" required>
                     </div>
-                    <button type="submit" class="submit-btn" style="background:#1f2937;">Secure Login</button>
-
-                    <div
-                        style="margin-top: 20px; background: #f0fdf4; padding: 15px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #bbf7d0; color: #166534;">
-                        <strong>Demo Credentials:</strong><br>
-                        Admin: admin / admin<br>
-                        Branch 1: b1 / pass<br>
-                        Branch 2: b2 / pass
-                    </div>
+                    <button type="submit" id="loginBtn" class="submit-btn" style="background:#1f2937;">Secure Login</button>
                 </form>
             </div>
         </div>
@@ -500,11 +417,11 @@
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="hidden fade-in">
 
-            <!-- ENTRY FORM (Only visible to Branch Users) -->
+            <!-- ENTRY FORM (Branch users only) -->
             <div id="entry-form-section" class="card">
                 <div class="section-title">
                     <span>New Ration Entry</span>
-                    <span style="font-size: 0.85rem; color: #666; font-weight: normal;">All fields are mandatory</span>
+                    <span style="font-size:0.85rem; color:#666; font-weight:normal;">All fields are mandatory</span>
                 </div>
                 <form id="requestForm">
                     <div class="form-grid">
@@ -519,26 +436,32 @@
                         <div class="form-group">
                             <label>CNIC Number</label>
                             <div class="cnic-container">
-                                <div class="cnic-group" id="g1"><input type="text" class="cnic-box" maxlength="1"
-                                        required><input type="text" class="cnic-box" maxlength="1" required><input
-                                        type="text" class="cnic-box" maxlength="1" required><input type="text"
-                                        class="cnic-box" maxlength="1" required><input type="text" class="cnic-box"
-                                        maxlength="1" required></div>
+                                <div class="cnic-group" id="g1">
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                </div>
                                 <span class="cnic-sep">-</span>
-                                <div class="cnic-group" id="g2"><input type="text" class="cnic-box" maxlength="1"
-                                        required><input type="text" class="cnic-box" maxlength="1" required><input
-                                        type="text" class="cnic-box" maxlength="1" required><input type="text"
-                                        class="cnic-box" maxlength="1" required><input type="text" class="cnic-box"
-                                        maxlength="1" required><input type="text" class="cnic-box" maxlength="1"
-                                        required><input type="text" class="cnic-box" maxlength="1" required></div>
+                                <div class="cnic-group" id="g2">
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                </div>
                                 <span class="cnic-sep">-</span>
-                                <div class="cnic-group" id="g3"><input type="text" class="cnic-box" maxlength="1"
-                                        required></div>
+                                <div class="cnic-group" id="g3">
+                                    <input type="text" class="cnic-box" maxlength="1" required>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-grid" style="margin-top: 15px;">
+                    <div class="form-grid" style="margin-top:15px;">
                         <div class="form-group">
                             <label>Area / Location</label>
                             <select id="area" onchange="app.toggleOtherArea(this.value)" required>
@@ -548,20 +471,15 @@
                                 <option value="Tariq Road">Tariq Road</option>
                                 <option value="Others">Others</option>
                             </select>
-                            <input type="text" id="otherArea" class="hidden" placeholder="Specify Area Name"
-                                style="margin-top: 8px;">
+                            <input type="text" id="otherArea" class="hidden" placeholder="Specify Area Name" style="margin-top:8px;">
                         </div>
-
                         <div class="form-group">
                             <label>Complete Address</label>
                             <input type="text" id="address" placeholder="House/Flat No, Street, Block" required>
                         </div>
-
-                        <!-- Status hidden default -->
-                        <input type="hidden" id="entryStatus" value="Registered">
                     </div>
 
-                    <button type="submit" class="submit-btn">Check Eligibility & Register</button>
+                    <button type="submit" id="submitEntryBtn" class="submit-btn">Check Eligibility & Register</button>
                 </form>
             </div>
 
@@ -569,11 +487,12 @@
             <div class="card">
                 <div class="section-title">
                     <span id="list-title">Registered Recipients</span>
+                    <button class="action-btn" onclick="app.loadData()" style="background:#6b7280; color:white; padding:8px 14px;">🔄 Refresh</button>
                 </div>
 
                 <div class="controls">
-                    <input type="text" id="f-cnic" placeholder=" Search CNIC..." onkeyup="app.filter()">
-                    <input type="text" id="f-mobile" placeholder=" Search Mobile..." onkeyup="app.filter()">
+                    <input type="text" id="f-cnic" placeholder="Search CNIC..." oninput="app.filter()">
+                    <input type="text" id="f-mobile" placeholder="Search Mobile..." oninput="app.filter()">
                     <select id="f-area" onchange="app.filter()">
                         <option value="">All Areas</option>
                         <option value="DHA">DHA</option>
@@ -586,25 +505,20 @@
                         <option value="Registered">Registered Only</option>
                         <option value="Delivered">Delivered Only</option>
                     </select>
-                    <button class="action-btn" onclick="app.resetFilters()"
-                        style="background:#6b7280; color:white; padding:10px 15px;">Reset</button>
+                    <button class="action-btn" onclick="app.resetFilters()" style="background:#6b7280; color:white; padding:10px 15px;">Reset</button>
                 </div>
 
-                <!-- Bulk Action Bar (Hidden by default) -->
+                <!-- Bulk Action Bar -->
                 <div id="bulk-actions-bar" class="bulk-actions hidden">
-                    <div>
-                        <span style="font-weight: bold;">Selected: </span>
-                        <span id="selected-count">0</span> recipients
-                    </div>
+                    <div><span style="font-weight:bold;">Selected: </span><span id="selected-count">0</span> recipients</div>
                     <button class="btn-bulk-approve" onclick="app.bulkDeliver()">✅ Mark Selected as Delivered</button>
                 </div>
 
                 <div class="table-responsive">
                     <table id="dashTable">
-                        <thead id="tableHead">
+                        <thead>
                             <tr>
-                                <th class="checkbox-col"><input type="checkbox" id="selectAll"
-                                        onchange="app.toggleSelectAll()"></th>
+                                <th class="checkbox-col"><input type="checkbox" id="selectAll" onchange="app.toggleSelectAll()"></th>
                                 <th>Name</th>
                                 <th>CNIC / Mobile</th>
                                 <th>Area</th>
@@ -624,38 +538,35 @@
 
     <!-- BRANCH MANAGEMENT VIEW -->
     <div id="view-branches" class="hidden fade-in">
+        <div style="max-width:1400px; margin:0 auto; padding:20px;">
         <div class="card">
             <div class="section-title">
                 <span>Manage Branches</span>
-                <button class="action-btn" onclick="app.switchView('dashboard')"
-                    style="background:#6b7280; color:white;">&larr; Back to Dashboard</button>
+                <button class="action-btn" onclick="app.switchView('dashboard')" style="background:#6b7280; color:white;">&larr; Back to Dashboard</button>
             </div>
 
-            <div class="form-grid"
-                style="margin-bottom: 30px; background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div class="form-grid" style="margin-bottom:30px; background:#f9fafb; padding:20px; border-radius:8px; border:1px solid #e5e7eb;">
                 <div class="form-group">
                     <label>Branch Name</label>
-                    <input type="text" id="newBrName" placeholder="e.g. Saylani Gui" required>
+                    <input type="text" id="newBrName" placeholder="e.g. Saylani Gulshan">
                 </div>
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="newBrUser" placeholder="e.g. b3" required>
+                    <input type="text" id="newBrUser" placeholder="e.g. b3">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="text" id="newBrPass" placeholder="e.g. pass123" required>
+                    <input type="text" id="newBrPass" placeholder="e.g. pass123">
                 </div>
                 <div class="form-group" style="display:flex; align-items:flex-end;">
-                    <button class="submit-btn" onclick="app.addBranch()" style="margin-top:0;">+ Add Branch</button>
+                    <button class="submit-btn" id="addBranchBtn" onclick="app.addBranch()" style="margin-top:0;">+ Add Branch</button>
                 </div>
             </div>
 
-            <div class="section-title">
-                <span>Existing Branches</span>
-            </div>
+            <div class="section-title"><span>Existing Branches</span></div>
 
             <div class="table-responsive">
-                <table id="branchTable">
+                <table>
                     <thead>
                         <tr>
                             <th>Branch Name</th>
@@ -664,31 +575,23 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="branchTableBody">
-                        <!-- Dynamic Content -->
-                    </tbody>
+                    <tbody id="branchTableBody"></tbody>
                 </table>
             </div>
         </div>
+        </div>
     </div>
-    </div>
-    <!-- MODAL -->
+
+    <!-- DUPLICATE MODAL -->
     <div id="duplicateModal" class="modal-overlay">
         <div class="modal">
-            <div style="font-size: 3rem; margin-bottom: 10px;">⚠️</div>
+            <div style="font-size:3rem; margin-bottom:10px;">⚠️</div>
             <h3 style="color:var(--warning); margin-bottom:10px;">Duplicate Record Found!</h3>
-            <div id="duplicateMsg"
-                style="background: #fffbeb; padding: 15px; border-radius: 8px; border: 1px solid #fde68a; text-align: left; font-size: 0.9rem; color: #92400e; margin-bottom: 20px;">
-                <!-- Dynamic Content -->
-            </div>
-            <p style="margin-bottom: 20px;">This recipient has already received ration. Do you still want to register
-                them again?</p>
+            <div id="duplicateMsg" style="background:#fffbeb; padding:15px; border-radius:8px; border:1px solid #fde68a; text-align:left; font-size:0.9rem; color:#92400e; margin-bottom:20px;"></div>
+            <p style="margin-bottom:20px;">This recipient has already received ration. Do you still want to register them again?</p>
             <div style="display:flex; justify-content:center; gap:10px;">
-                <button class="action-btn" onclick="app.modalResolve(false)"
-                    style="background:#9ca3af; color:white; padding: 10px 20px; font-size:1rem;">No, Cancel</button>
-                <button class="action-btn" onclick="app.modalResolve(true)"
-                    style="background:var(--primary); color:white; padding: 10px 20px; font-size:1rem;">Yes, Force
-                    Register</button>
+                <button class="action-btn" onclick="app.modalResolve(false)" style="background:#9ca3af; color:white; padding:10px 20px; font-size:1rem;">No, Cancel</button>
+                <button class="action-btn" onclick="app.modalResolve(true)" style="background:var(--primary); color:white; padding:10px 20px; font-size:1rem;">Yes, Force Register</button>
             </div>
         </div>
     </div>
@@ -696,207 +599,185 @@
     <div id="toast" class="toast"><span id="toastMsg"></span></div>
 
     <script>
-        // --- DATA ---
-        // Basic user auth structure (Persisted for branch management)
-        // const users = [ ... ]; // Removed hardcoded users
+        // ─── SUPABASE INIT ───────────────────────────────────────────────────────────
+        const SUPABASE_URL = 'https://fmthblifhgmezsubtqsf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtdGhibGlmaGdtZXpzdWJ0cXNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzOTM3NjQsImV4cCI6MjA4Njk2OTc2NH0.Rrp4ty1crLjurj0YP1IYQlJVS7sM75icb4kaqHeA2ZI';
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-
+        // ─── APP ─────────────────────────────────────────────────────────────────────
         const app = {
             currentUser: null,
             modalPromise: null,
-            currentUser: null,
-            modalPromise: null,
-            data: [], // Will hold requests
-            users: [], // Will hold users
+            data: [],        // cached recipients
+            users: [],       // cached users
             selectedIds: new Set(),
 
-            init() {
-                this.loadUsers();
-                this.loadData();
+            // ── INIT ──────────────────────────────────────────────────────────────
+            async init() {
                 this.setupCnicAutoTab();
-                this.setupListeners();
-                // Check if session exists (simple check)
-                const savedUser = localStorage.getItem('rds_user');
+
+                // Check session
+                const savedUser = sessionStorage.getItem('rds_user');
                 if (savedUser) {
                     this.currentUser = JSON.parse(savedUser);
-                    // Validate if user still exists (in case it was deleted)
-                    const validUser = this.users.find(u => u.id === this.currentUser.id);
-                    if (validUser) {
-                        this.currentUser = validUser; // Update ref
+                }
+
+                // Load users from Supabase
+                await this.loadUsers();
+
+                // Validate session user still exists
+                if (this.currentUser) {
+                    const valid = this.users.find(u => u.id === this.currentUser.id);
+                    if (valid) {
+                        this.currentUser = valid;
+                        await this.loadData();
                         this.switchView('dashboard');
                     } else {
-                        localStorage.removeItem('rds_user');
+                        sessionStorage.removeItem('rds_user');
+                        this.currentUser = null;
                         this.switchView('login');
                     }
                 } else {
                     this.switchView('login');
                 }
+
+                this.setupListeners();
+                document.getElementById('loadingOverlay').style.display = 'none';
             },
 
-            loadUsers() {
-                const storedUsers = localStorage.getItem('rds_users');
-                if (storedUsers) {
-                    this.users = JSON.parse(storedUsers);
-                } else {
-                    // Default seed data
-                    this.users = [
-                        { id: 'admin', u: 'admin', p: 'admin', n: 'Head Office', r: 'admin' },
-                        { id: 'b1', u: 'b1', p: 'pass', n: 'Saylani DHA', r: 'branch' },
-                        { id: 'b2', u: 'b2', p: 'pass', n: 'Saylani Clifton', r: 'branch' }
-                    ];
-                    this.saveUsers();
+            // ── DATA LOADING ──────────────────────────────────────────────────────
+            async loadUsers() {
+                const { data, error } = await db.from('users').select('*');
+                if (error) { this.showToast('Error loading users: ' + error.message); return; }
+                this.users = data || [];
+            },
+
+            async loadData() {
+                const isAdmin = this.currentUser?.role === 'admin';
+                let query = db
+                    .from('recipients')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (!isAdmin) {
+                    query = query.eq('branch_id', this.currentUser.id);
                 }
+
+                const { data, error } = await query;
+                if (error) { this.showToast('Error loading data: ' + error.message); return; }
+                this.data = data || [];
+                this.renderDash();
             },
 
-            saveUsers() {
-                localStorage.setItem('rds_users', JSON.stringify(this.users));
-            },
-
-            loadData() {
-                const stored = localStorage.getItem('rds_data');
-                if (stored) {
-                    this.data = JSON.parse(stored);
-                } else {
-                    // Default seed data if empty
-                    this.data = [
-                        { id: 1708891000000, name: 'Ahmad Ali', cnic: '42101-1111111-1', mob: '03001111111', area: 'DHA', addr: 'Street 1, Phase 2', status: 'Registered', branch_id: 'b1', ts: '2023-10-25 09:15:02', isDup: false },
-                        { id: 1708892000000, name: 'Sarah Khan', cnic: '42101-2222222-2', mob: '03002222222', area: 'Clifton', addr: 'Flat 402, Ocean View', status: 'Delivered', branch_id: 'b2', ts: '2023-10-24 14:05:11', isDup: false },
-                    ];
-                    this.saveData();
-                }
-            },
-
-            saveData() {
-                localStorage.setItem('rds_data', JSON.stringify(this.data));
-            },
-
-            setupCnicAutoTab() {
-                const boxes = document.querySelectorAll('.cnic-box');
-                boxes.forEach((box, i) => {
-                    // Auto-tab
-                    box.oninput = () => {
-                        if (box.value && boxes[i + 1]) boxes[i + 1].focus();
-                    };
-
-                    // Backspace navigation
-                    box.onkeydown = (e) => {
-                        if (e.key === 'Backspace' && !box.value && boxes[i - 1]) boxes[i - 1].focus();
-                    };
-
-                    // Paste support
-                    box.onpaste = (e) => {
-                        e.preventDefault();
-                        const pasteData = (e.clipboardData || window.clipboardData).getData('text');
-                        const digits = pasteData.replace(/\D/g, ''); // Keep numbers only
-
-                        if (!digits) return;
-
-                        let currentIdx = i;
-                        let digitIdx = 0;
-
-                        while (currentIdx < boxes.length && digitIdx < digits.length) {
-                            boxes[currentIdx].value = digits[digitIdx];
-                            currentIdx++;
-                            digitIdx++;
-                        }
-
-                        // Focus the next empty box or the last one
-                        if (currentIdx < boxes.length) {
-                            boxes[currentIdx].focus();
-                        } else {
-                            boxes[boxes.length - 1].focus();
-                        }
-                    };
-                });
-            },
-
+            // ── LISTENERS ─────────────────────────────────────────────────────────
             setupListeners() {
-                // Login
-                document.getElementById('loginForm').onsubmit = (e) => {
+                document.getElementById('loginForm').onsubmit = async (e) => {
                     e.preventDefault();
+                    const btn = document.getElementById('loginBtn');
+                    btn.disabled = true;
+                    btn.textContent = 'Logging in...';
+
                     const uIn = document.getElementById('user').value.toLowerCase().trim();
                     const pIn = document.getElementById('pass').value;
-                    const u = this.users.find(x => x.u === uIn && x.p === pIn);
+
+                    // Reload users fresh on login attempt
+                    await this.loadUsers();
+                    const u = this.users.find(x => x.username === uIn && x.password === pIn);
 
                     if (u) {
                         this.currentUser = u;
-                        localStorage.setItem('rds_user', JSON.stringify(u));
+                        sessionStorage.setItem('rds_user', JSON.stringify(u));
+                        await this.loadData();
                         this.switchView('dashboard');
                     } else {
-                        this.showToast("Invalid Credentials");
+                        this.showToast('Invalid Credentials');
                     }
+
+                    btn.disabled = false;
+                    btn.textContent = 'Secure Login';
                 };
 
-                // Entry Form
                 document.getElementById('requestForm').onsubmit = async (e) => {
                     e.preventDefault();
                     await this.handleEntry();
                 };
             },
 
+            // ── ENTRY HANDLING ────────────────────────────────────────────────────
             async handleEntry() {
                 const cnicRaw = [...document.querySelectorAll('.cnic-box')].map(b => b.value).join('');
-                if (cnicRaw.length !== 13) { this.showToast("Invalid CNIC length"); return; }
+                if (cnicRaw.length !== 13) { this.showToast('Invalid CNIC length'); return; }
 
-                const formattedCnic = `${cnicRaw.slice(0, 5)}-${cnicRaw.slice(5, 12)}-${cnicRaw.slice(12)}`;
-                const mobile = document.getElementById('mobile').value;
+                const formattedCnic = `${cnicRaw.slice(0,5)}-${cnicRaw.slice(5,12)}-${cnicRaw.slice(12)}`;
+                const mobile = document.getElementById('mobile').value.trim();
                 const areaSelect = document.getElementById('area').value;
-                const finalArea = (areaSelect === 'Others') ? document.getElementById('otherArea').value : areaSelect;
+                const finalArea = (areaSelect === 'Others') ? document.getElementById('otherArea').value.trim() : areaSelect;
 
                 if (areaSelect === 'Others' && !finalArea) {
-                    this.showToast("Please specify the Area name");
+                    this.showToast('Please specify the Area name');
                     return;
                 }
 
-                // New Entry Object
+                const btn = document.getElementById('submitEntryBtn');
+                btn.disabled = true;
+                btn.textContent = 'Checking...';
+
+                // Check for duplicates in Supabase
+                const { data: dups } = await db
+                    .from('recipients')
+                    .select('*, users!inner(name)')
+                    .or(`cnic.eq.${formattedCnic},mobile.eq.${mobile}`)
+                    .limit(1);
+
                 const newEntry = {
                     id: Date.now(),
-                    name: document.getElementById('fullName').value,
+                    name: document.getElementById('fullName').value.trim(),
                     cnic: formattedCnic,
-                    mob: mobile,
+                    mobile: mobile,
                     area: finalArea,
-                    addr: document.getElementById('address').value,
-                    status: 'Registered', // Default status
+                    address: document.getElementById('address').value.trim(),
+                    status: 'Registered',
                     branch_id: this.currentUser.id,
-                    ts: this.getTimestamp(),
-                    isDup: false
+                    is_duplicate: false,
+                    timestamp: this.getTimestamp(),
                 };
 
-                // Check Duplicates (Global check)
-                const duplicate = this.data.find(r => r.cnic === formattedCnic || r.mob === mobile);
+                if (dups && dups.length > 0) {
+                    const dup = dups[0];
+                    const branchName = this.users.find(u => u.id === dup.branch_id)?.name || 'Unknown Branch';
+                    const matchType = dup.cnic === formattedCnic ? 'CNIC' : 'Mobile Number';
+                    const matchVal = dup.cnic === formattedCnic ? dup.cnic : dup.mobile;
 
-                if (duplicate) {
-                    // Logic to find branch name
-                    // Logic to find branch name
-                    const branchName = this.users.find(u => u.id === duplicate.branch_id)?.n || 'Unknown Branch';
-                    const matchType = (duplicate.cnic === formattedCnic) ? "CNIC" : "Mobile Number";
+                    document.getElementById('duplicateMsg').innerHTML =
+                        `This <strong>${matchType}</strong> (<code>${matchVal}</code>) was already registered in <strong>${branchName}</strong> on <strong>${dup.timestamp}</strong>.`;
 
-                    const msg = `This <strong>${matchType}</strong> (${duplicate.cnic === formattedCnic ? duplicate.cnic : duplicate.mob}) was already registered in <strong>${branchName}</strong> on <strong>${duplicate.ts}</strong>.`;
-
-                    document.getElementById('duplicateMsg').innerHTML = msg;
-
-                    const allow = await this.askUser(); // Open Modal
+                    const allow = await this.askUser();
 
                     if (allow) {
-                        newEntry.isDup = true;
-                        this.addRecord(newEntry);
-                        this.resetForm(document.getElementById('requestForm'));
+                        newEntry.is_duplicate = true;
+                        await this.addRecord(newEntry);
+                        this.resetForm();
                     }
                 } else {
-                    this.addRecord(newEntry);
-                    this.resetForm(document.getElementById('requestForm'));
+                    await this.addRecord(newEntry);
+                    this.resetForm();
                 }
+
+                btn.disabled = false;
+                btn.textContent = 'Check Eligibility & Register';
             },
 
-            addRecord(entry) {
+            async addRecord(entry) {
+                const { error } = await db.from('recipients').insert([entry]);
+                if (error) { this.showToast('Error saving record: ' + error.message); return; }
                 this.data.unshift(entry);
-                this.saveData();
-                this.showToast(entry.isDup ? "Duplicate Entry Added" : "Recipient Registered Successfully");
+                this.showToast(entry.is_duplicate ? 'Duplicate Entry Added' : 'Recipient Registered Successfully');
                 this.renderDash();
             },
 
-            resetForm(form) {
-                form.reset();
+            resetForm() {
+                document.getElementById('requestForm').reset();
                 document.querySelectorAll('.cnic-box').forEach(b => b.value = '');
                 this.toggleOtherArea('');
             },
@@ -912,8 +793,7 @@
                 }
             },
 
-            // --- DASHBOARD RENDERING ---
-
+            // ── DASHBOARD ─────────────────────────────────────────────────────────
             switchView(v) {
                 document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
                 document.getElementById('view-' + v).classList.remove('hidden');
@@ -922,28 +802,20 @@
                     this.prepareDashboard();
                 } else if (v === 'branches') {
                     this.prepareBranches();
-                } else {
+                } else if (v === 'login') {
                     this.currentUser = null;
-                    localStorage.removeItem('rds_user');
+                    sessionStorage.removeItem('rds_user');
                 }
                 this.renderNav();
             },
 
             prepareDashboard() {
-                const isAdmin = this.currentUser.r === 'admin';
-                const formSection = document.getElementById('entry-form-section');
-
-                if (isAdmin) {
-                    formSection.classList.add('hidden');
-                    document.getElementById('list-title').innerText = "Global Distribution Database (Admin)";
-                    document.getElementById('th-branch').classList.remove('hidden');
-                    document.getElementById('th-actions').classList.remove('hidden');
-                } else {
-                    formSection.classList.remove('hidden');
-                    document.getElementById('list-title').innerText = "My Branch Requests";
-                    document.getElementById('th-branch').classList.add('hidden');
-                }
-
+                const isAdmin = this.currentUser.role === 'admin';
+                document.getElementById('entry-form-section').classList.toggle('hidden', isAdmin);
+                document.getElementById('list-title').innerText = isAdmin
+                    ? 'Global Distribution Database (Admin)'
+                    : 'My Branch Requests';
+                document.getElementById('th-branch').classList.toggle('hidden', !isAdmin);
                 this.selectedIds.clear();
                 this.renderDash();
             },
@@ -953,20 +825,16 @@
                 const mTerm = document.getElementById('f-mobile').value.toLowerCase();
                 const aTerm = document.getElementById('f-area').value;
                 const sTerm = document.getElementById('f-status').value;
-                const isAdmin = this.currentUser.r === 'admin';
 
-                let baseData = isAdmin ? this.data : this.data.filter(r => r.branch_id === this.currentUser.id);
-
-                return baseData.filter(r => {
-                    const matchesCnic = r.cnic.includes(cTerm);
-                    const matchesMob = r.mob.includes(mTerm);
+                return this.data.filter(r => {
+                    const matchesCnic = r.cnic.toLowerCase().includes(cTerm);
+                    const matchesMob = r.mobile.toLowerCase().includes(mTerm);
                     let matchesArea = true;
                     if (aTerm) {
                         if (aTerm === 'Others') matchesArea = !['DHA', 'Clifton', 'Tariq Road'].includes(r.area);
                         else matchesArea = r.area === aTerm;
                     }
                     const matchesStatus = sTerm ? r.status === sTerm : true;
-
                     return matchesCnic && matchesMob && matchesArea && matchesStatus;
                 });
             },
@@ -974,12 +842,11 @@
             renderDash() {
                 const body = document.getElementById('tableBody');
                 body.innerHTML = '';
-
                 const filtered = this.getFilteredData();
-                const isAdmin = this.currentUser.r === 'admin';
+                const isAdmin = this.currentUser?.role === 'admin';
 
-                // Handle Bulk Selection State
-                document.getElementById('selectAll').checked = filtered.length > 0 && filtered.every(r => this.selectedIds.has(r.id));
+                document.getElementById('selectAll').checked =
+                    filtered.length > 0 && filtered.every(r => this.selectedIds.has(r.id));
                 this.updateBulkBar();
 
                 if (filtered.length === 0) {
@@ -988,15 +855,14 @@
                 }
 
                 filtered.forEach(r => {
-                    const branchName = this.users.find(u => u.id === r.branch_id)?.n || 'Unknown';
-                    const dupClass = r.isDup ? 'row-duplicate' : '';
+                    const branchName = this.users.find(u => u.id === r.branch_id)?.name || 'Unknown';
+                    const dupClass = r.is_duplicate ? 'row-duplicate' : '';
                     const isChecked = this.selectedIds.has(r.id) ? 'checked' : '';
 
-                    const statusBadge = r.isDup
+                    const statusBadge = r.is_duplicate
                         ? `<span class="badge badge-dup">Dup / ${r.status}</span>`
                         : `<span class="badge ${r.status === 'Delivered' ? 'badge-del' : 'badge-reg'}">${r.status}</span>`;
 
-                    // Single Action Button Logic
                     let actionHtml = '';
                     if (r.status === 'Registered') {
                         actionHtml += `<button class="action-btn btn-deliver" onclick="app.setStatus(${r.id}, 'Delivered')">Mark Delivered</button>`;
@@ -1012,11 +878,11 @@
                         <td><strong>${r.name}</strong></td>
                         <td>
                             <div style="font-family:monospace; font-size:0.9rem;">${r.cnic}</div>
-                            <div style="font-size:0.8rem; color:#666;">${r.mob}</div>
+                            <div style="font-size:0.8rem; color:#666;">${r.mobile}</div>
                         </td>
                         <td>${r.area}</td>
-                        <td style="font-size:0.85rem; max-width:200px;">${r.addr}</td>
-                        <td style="font-size:0.8rem; color:#666; white-space:nowrap;">${r.ts}</td>
+                        <td style="font-size:0.85rem; max-width:200px;">${r.address}</td>
+                        <td style="font-size:0.8rem; color:#666; white-space:nowrap;">${r.timestamp}</td>
                         ${isAdmin ? `<td style="font-size:0.8rem;">${branchName}</td>` : '<td class="hidden"></td>'}
                         <td>${statusBadge}</td>
                         <td style="display:flex; gap:5px; flex-wrap:wrap;">${actionHtml}</td>
@@ -1025,103 +891,169 @@
                 });
             },
 
-            // --- BULK ACTIONS ---
-
+            // ── BULK ACTIONS ──────────────────────────────────────────────────────
             toggleSelect(id) {
                 if (this.selectedIds.has(id)) this.selectedIds.delete(id);
                 else this.selectedIds.add(id);
-                this.renderDash(); // Re-render to update header checkbox
+                this.renderDash();
             },
 
             toggleSelectAll() {
                 const filtered = this.getFilteredData();
                 const allSelected = filtered.every(r => this.selectedIds.has(r.id));
-
-                if (allSelected) {
-                    filtered.forEach(r => this.selectedIds.delete(r.id));
-                } else {
-                    filtered.forEach(r => this.selectedIds.add(r.id));
-                }
+                if (allSelected) filtered.forEach(r => this.selectedIds.delete(r.id));
+                else filtered.forEach(r => this.selectedIds.add(r.id));
                 this.renderDash();
             },
 
             updateBulkBar() {
                 const bar = document.getElementById('bulk-actions-bar');
-                const countSpan = document.getElementById('selected-count');
-                if (this.selectedIds.size > 0) {
-                    bar.classList.remove('hidden');
-                    countSpan.innerText = this.selectedIds.size;
-                } else {
-                    bar.classList.add('hidden');
-                }
+                document.getElementById('selected-count').innerText = this.selectedIds.size;
+                bar.classList.toggle('hidden', this.selectedIds.size === 0);
             },
 
-            bulkDeliver() {
+            async bulkDeliver() {
                 if (!confirm(`Mark ${this.selectedIds.size} recipients as Delivered?`)) return;
 
-                let updatedCount = 0;
-                this.data.forEach(r => {
-                    if (this.selectedIds.has(r.id) && r.status !== 'Delivered') {
-                        r.status = 'Delivered';
-                        updatedCount++;
-                    }
+                const ids = [...this.selectedIds];
+                const toUpdate = this.data.filter(r => ids.includes(r.id) && r.status !== 'Delivered');
+
+                if (toUpdate.length === 0) {
+                    this.showToast('Selected records are already Delivered');
+                    return;
+                }
+
+                const { error } = await db
+                    .from('recipients')
+                    .update({ status: 'Delivered' })
+                    .in('id', toUpdate.map(r => r.id));
+
+                if (error) { this.showToast('Error updating records: ' + error.message); return; }
+
+                toUpdate.forEach(r => { r.status = 'Delivered'; });
+                this.selectedIds.clear();
+                this.showToast(`${toUpdate.length} records updated to Delivered`);
+                this.renderDash();
+            },
+
+            // ── SINGLE ACTIONS ────────────────────────────────────────────────────
+            async setStatus(id, status) {
+                const { error } = await db.from('recipients').update({ status }).eq('id', id);
+                if (error) { this.showToast('Error: ' + error.message); return; }
+                const rec = this.data.find(r => r.id === id);
+                if (rec) rec.status = status;
+                this.renderDash();
+                this.showToast(`Status updated to ${status}`);
+            },
+
+            async deleteRecord(id) {
+                if (!confirm('Are you sure you want to permanently delete this record?')) return;
+                const { error } = await db.from('recipients').delete().eq('id', id);
+                if (error) { this.showToast('Error: ' + error.message); return; }
+                this.data = this.data.filter(r => r.id !== id);
+                this.selectedIds.delete(id);
+                this.renderDash();
+                this.showToast('Record Deleted');
+            },
+
+            // ── BRANCH MANAGEMENT ─────────────────────────────────────────────────
+            prepareBranches() {
+                this.renderBranches();
+            },
+
+            renderBranches() {
+                const tbody = document.getElementById('branchTableBody');
+                tbody.innerHTML = '';
+
+                this.users.filter(u => u.id !== 'admin').forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${u.name}</td>
+                        <td>${u.username}</td>
+                        <td style="font-family:monospace; letter-spacing:1px; color:#666;">${u.password}</td>
+                        <td><button class="action-btn btn-delete" onclick="app.deleteBranch('${u.id}')">Delete</button></td>
+                    `;
+                    tbody.appendChild(tr);
                 });
 
-                if (updatedCount > 0) {
-                    this.saveData();
-                    this.selectedIds.clear();
-                    this.showToast(`${updatedCount} records updated to Delivered`);
-                    this.renderDash();
+                if (this.users.filter(u => u.id !== 'admin').length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">No branches yet</td></tr>';
+                }
+            },
+
+            async addBranch() {
+                const name = document.getElementById('newBrName').value.trim();
+                const username = document.getElementById('newBrUser').value.trim().toLowerCase();
+                const password = document.getElementById('newBrPass').value.trim();
+
+                if (!name || !username || !password) {
+                    this.showToast('Please fill all fields');
+                    return;
+                }
+
+                if (this.users.find(u => u.username === username)) {
+                    this.showToast('Username already exists');
+                    return;
+                }
+
+                const btn = document.getElementById('addBranchBtn');
+                btn.disabled = true;
+                btn.textContent = 'Adding...';
+
+                const newBranch = {
+                    id: 'b_' + Date.now(),
+                    username,
+                    password,
+                    name,
+                    role: 'branch'
+                };
+
+                const { error } = await db.from('users').insert([newBranch]);
+                if (error) {
+                    this.showToast('Error: ' + error.message);
                 } else {
-                    this.showToast("Selected records are already Delivered");
+                    this.users.push(newBranch);
+                    this.renderBranches();
+                    this.showToast('Branch Added Successfully');
+                    document.getElementById('newBrName').value = '';
+                    document.getElementById('newBrUser').value = '';
+                    document.getElementById('newBrPass').value = '';
                 }
+
+                btn.disabled = false;
+                btn.textContent = '+ Add Branch';
             },
 
-            // --- SINGLE ACTIONS ---
+            async deleteBranch(id) {
+                if (!confirm("Delete this branch? Their existing records will remain, but they won't be able to login.")) return;
 
-            setStatus(id, status) {
-                const rec = this.data.find(r => r.id === id);
-                if (rec) {
-                    rec.status = status;
-                    this.saveData();
-                    this.renderDash();
-                    this.showToast(`Status updated to ${status}`);
-                }
+                const { error } = await db.from('users').delete().eq('id', id);
+                if (error) { this.showToast('Error: ' + error.message); return; }
+
+                this.users = this.users.filter(u => u.id !== id);
+                this.renderBranches();
+                this.showToast('Branch Deleted');
             },
 
-            deleteRecord(id) {
-                if (confirm("Are you sure you want to permanently delete this record?")) {
-                    this.data = this.data.filter(r => r.id !== id);
-                    this.saveData();
-                    this.selectedIds.delete(id); // remove from selection if selected
-                    this.renderDash();
-                    this.showToast("Record Deleted");
-                }
-            },
-
-            // --- UTILS ---
-
+            // ── NAV ───────────────────────────────────────────────────────────────
             renderNav() {
                 const nav = document.getElementById('nav-actions');
                 const branchLabel = document.getElementById('nav-branch-name');
                 if (this.currentUser) {
-                    branchLabel.innerText = this.currentUser.n;
+                    branchLabel.innerText = this.currentUser.name;
                     let html = '';
-                    if (this.currentUser.r === 'admin') {
+                    if (this.currentUser.role === 'admin') {
                         html += `<button onclick="app.switchView('branches')" style="background:var(--primary); color:white; margin-right:10px;">Manage Branches</button>`;
                     }
                     html += `<button class="nav-btn-danger" onclick="app.logout()">Logout</button>`;
                     nav.innerHTML = html;
                 } else {
-                    branchLabel.innerText = "";
-                    nav.innerHTML = "";
+                    branchLabel.innerText = '';
+                    nav.innerHTML = '';
                 }
             },
 
-            logout() {
-                this.switchView('login');
-            },
-
+            logout() { this.switchView('login'); },
             filter() { this.renderDash(); },
 
             resetFilters() {
@@ -1132,13 +1064,14 @@
                 this.renderDash();
             },
 
+            // ── UTILS ─────────────────────────────────────────────────────────────
             getTimestamp() {
-                const now = new Date();
-                return now.getFullYear() + '-' +
-                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                    String(now.getDate()).padStart(2, '0') + ' ' +
-                    String(now.getHours()).padStart(2, '0') + ':' +
-                    String(now.getMinutes()).padStart(2, '0');
+                const n = new Date();
+                return n.getFullYear() + '-' +
+                    String(n.getMonth()+1).padStart(2,'0') + '-' +
+                    String(n.getDate()).padStart(2,'0') + ' ' +
+                    String(n.getHours()).padStart(2,'0') + ':' +
+                    String(n.getMinutes()).padStart(2,'0');
             },
 
             askUser() {
@@ -1158,81 +1091,25 @@
                 setTimeout(() => t.classList.remove('show'), 3000);
             },
 
-            // --- BRANCH MANAGEMENT ---
-
-            prepareBranches() {
-                this.renderBranches();
-            },
-
-            renderBranches() {
-                const tbody = document.getElementById('branchTableBody');
-                tbody.innerHTML = '';
-
-                this.users.forEach(u => {
-                    // Don't show admin in the list (or disable deleting it)
-                    if (u.id === 'admin') return;
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${u.n}</td>
-                        <td>${u.u}</td>
-                        <td style="font-family:monospace; letter-spacing:1px; color:#666;">${u.p}</td>
-                        <td>
-                            <button class="action-btn btn-delete" onclick="app.deleteBranch('${u.id}')">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+            setupCnicAutoTab() {
+                const boxes = document.querySelectorAll('.cnic-box');
+                boxes.forEach((box, i) => {
+                    box.oninput = () => { if (box.value && boxes[i+1]) boxes[i+1].focus(); };
+                    box.onkeydown = (e) => { if (e.key === 'Backspace' && !box.value && boxes[i-1]) boxes[i-1].focus(); };
+                    box.onpaste = (e) => {
+                        e.preventDefault();
+                        const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+                        if (!digits) return;
+                        let ci = i, di = 0;
+                        while (ci < boxes.length && di < digits.length) { boxes[ci].value = digits[di]; ci++; di++; }
+                        if (ci < boxes.length) boxes[ci].focus();
+                        else boxes[boxes.length-1].focus();
+                    };
                 });
-            },
-
-            addBranch() {
-                const name = document.getElementById('newBrName').value.trim();
-                const user = document.getElementById('newBrUser').value.trim().toLowerCase();
-                const pass = document.getElementById('newBrPass').value.trim();
-
-                if (!name || !user || !pass) {
-                    this.showToast("Please fill all fields");
-                    return;
-                }
-
-                // Check username uniqueness
-                if (this.users.find(u => u.u === user)) {
-                    this.showToast("Username already exists");
-                    return;
-                }
-
-                const newBranch = {
-                    id: 'b_' + Date.now(),
-                    u: user,
-                    p: pass,
-                    n: name,
-                    r: 'branch'
-                };
-
-                this.users.push(newBranch);
-                this.saveUsers();
-                this.renderBranches();
-                this.showToast("Branch Added Successfully");
-
-                // Clear form
-                document.getElementById('newBrName').value = '';
-                document.getElementById('newBrUser').value = '';
-                document.getElementById('newBrPass').value = '';
-            },
-
-            deleteBranch(id) {
-                if (!confirm("Are you sure? This will not delete the data associated with the branch, but they won't be able to login.")) return;
-
-                this.users = this.users.filter(u => u.id !== id);
-                this.saveUsers();
-                this.renderBranches();
-                this.showToast("Branch Deleted");
             }
         };
 
-        // Initialize App
         app.init();
     </script>
 </body>
-
 </html>
