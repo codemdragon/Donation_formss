@@ -237,7 +237,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 900px;
+            min-width: 1050px;
         }
 
         th, td {
@@ -520,7 +520,8 @@
                             <tr>
                                 <th class="checkbox-col"><input type="checkbox" id="selectAll" onchange="app.toggleSelectAll()"></th>
                                 <th>Name</th>
-                                <th>CNIC / Mobile</th>
+                                <th>CNIC</th>
+                                <th>Mobile</th>
                                 <th>Area</th>
                                 <th>Address</th>
                                 <th>Time Stamp</th>
@@ -586,7 +587,7 @@
     <div id="duplicateModal" class="modal-overlay">
         <div class="modal">
             <div style="font-size:3rem; margin-bottom:10px;">⚠️</div>
-            <h3 style="color:var(--warning); margin-bottom:10px;">Duplicate Record Found!</h3>
+            <h3 style="color:var(--warning); margin-bottom:10px;" id="duplicateTitle">Duplicate Record(s) Detected!</h3>
             <div id="duplicateMsg" style="background:#fffbeb; padding:15px; border-radius:8px; border:1px solid #fde68a; text-align:left; font-size:0.9rem; color:#92400e; margin-bottom:20px;"></div>
             <p style="margin-bottom:20px;">This recipient has already received ration. Do you still want to register them again?</p>
             <div style="display:flex; justify-content:center; gap:10px;">
@@ -723,12 +724,7 @@
                 btn.disabled = true;
                 btn.textContent = 'Checking...';
 
-                // Check for duplicates in Supabase
-                const { data: dups } = await db
-                    .from('recipients')
-                    .select('*, users!inner(name)')
-                    .or(`cnic.eq.${formattedCnic},mobile.eq.${mobile}`)
-                    .limit(1);
+                const enteredAddress = document.getElementById('address').value.trim();
 
                 const newEntry = {
                     id: Date.now(),
@@ -736,24 +732,59 @@
                     cnic: formattedCnic,
                     mobile: mobile,
                     area: finalArea,
-                    address: document.getElementById('address').value.trim(),
+                    address: enteredAddress,
                     status: 'Registered',
                     branch_id: this.currentUser.id,
                     is_duplicate: false,
                     timestamp: this.getTimestamp(),
                 };
 
-                if (dups && dups.length > 0) {
-                    const dup = dups[0];
-                    const branchName = this.users.find(u => u.id === dup.branch_id)?.name || 'Unknown Branch';
-                    const matchType = dup.cnic === formattedCnic ? 'CNIC' : 'Mobile Number';
-                    const matchVal = dup.cnic === formattedCnic ? dup.cnic : dup.mobile;
+                // ── Check CNIC, Mobile, and Address separately ──────────────────
+                // Fetch candidates matching CNIC or mobile first, then do address check separately
+                const { data: cnicMobileDups } = await db
+                    .from('recipients')
+                    .select('id, name, cnic, mobile, address, branch_id, timestamp')
+                    .or(`cnic.eq.${formattedCnic},mobile.eq.${mobile}`);
 
-                    document.getElementById('duplicateMsg').innerHTML =
-                        `This <strong>${matchType}</strong> (<code>${matchVal}</code>) was already registered in <strong>${branchName}</strong> on <strong>${dup.timestamp}</strong>.`;
+                // Address check (case-insensitive exact match via ilike without wildcards)
+                const { data: addrDups } = await db
+                    .from('recipients')
+                    .select('id, name, cnic, mobile, address, branch_id, timestamp')
+                    .ilike('address', enteredAddress);
 
+                const allDups = [...(cnicMobileDups || []), ...(addrDups || [])];
+                // Deduplicate by id
+                const seen = new Set();
+                const uniqueDups = allDups.filter(r => { if (seen.has(r.id)) return false; seen.add(r.id); return true; });
+
+                const dupMatches = [];
+
+                if (uniqueDups && uniqueDups.length > 0) {
+                    const cnicMatch   = uniqueDups.find(r => r.cnic === formattedCnic);
+                    const mobileMatch = uniqueDups.find(r => r.mobile === mobile);
+                    const addrMatch   = uniqueDups.find(r =>
+                        r.address.trim().toLowerCase() === enteredAddress.toLowerCase()
+                    );
+
+                    const fmt = (r, label, val) => {
+                        const branch = this.users.find(u => u.id === r.branch_id)?.name || 'Unknown Branch';
+                        return `<div style="margin-bottom:8px;">⚠️ <strong>${label}</strong> <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;">${val}</code> was already registered under <strong>${r.name}</strong> at <strong>${branch}</strong> on <strong>${r.timestamp}</strong>.</div>`;
+                    };
+
+                    if (cnicMatch)  dupMatches.push(fmt(cnicMatch,  'CNIC',    cnicMatch.cnic));
+                    if (mobileMatch && mobileMatch.id !== cnicMatch?.id)
+                        dupMatches.push(fmt(mobileMatch, 'Mobile',  mobileMatch.mobile));
+                    if (addrMatch && addrMatch.id !== cnicMatch?.id && addrMatch.id !== mobileMatch?.id)
+                        dupMatches.push(fmt(addrMatch,   'Address', addrMatch.address));
+                }
+
+                if (dupMatches.length > 0) {
+                    const title = document.getElementById('duplicateTitle');
+                    if (title) title.innerText = dupMatches.length > 1
+                        ? `${dupMatches.length} Duplicate Matches Found!`
+                        : 'Duplicate Record Found!';
+                    document.getElementById('duplicateMsg').innerHTML = dupMatches.join('');
                     const allow = await this.askUser();
-
                     if (allow) {
                         newEntry.is_duplicate = true;
                         await this.addRecord(newEntry);
@@ -850,7 +881,7 @@
                 this.updateBulkBar();
 
                 if (filtered.length === 0) {
-                    body.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px; color:#999;">No records match your filters</td></tr>';
+                    body.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:#999;">No records match your filters</td></tr>';
                     return;
                 }
 
@@ -876,10 +907,8 @@
                     tr.innerHTML = `
                         <td class="checkbox-col"><input type="checkbox" class="row-select" onchange="app.toggleSelect(${r.id})" ${isChecked}></td>
                         <td><strong>${r.name}</strong></td>
-                        <td>
-                            <div style="font-family:monospace; font-size:0.9rem;">${r.cnic}</div>
-                            <div style="font-size:0.8rem; color:#666;">${r.mobile}</div>
-                        </td>
+                        <td style="font-family:monospace; font-size:0.85rem; white-space:nowrap; letter-spacing:0.03em;">${r.cnic}</td>
+                        <td style="font-size:0.88rem; white-space:nowrap;">${r.mobile}</td>
                         <td>${r.area}</td>
                         <td style="font-size:0.85rem; max-width:200px;">${r.address}</td>
                         <td style="font-size:0.8rem; color:#666; white-space:nowrap;">${r.timestamp}</td>
